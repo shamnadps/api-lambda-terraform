@@ -28,7 +28,7 @@ resource "aws_lambda_function" "lambda_function" {
   function_name    = "MyLambdaFunction"
   role             = aws_iam_role.lambda_execution.arn
   handler          = "index.handler"
-  runtime          = "nodejs20.x"
+  runtime          = "python3.9"
   source_code_hash = filebase64sha256("lambda_function_payload.zip")
 }
 
@@ -37,7 +37,7 @@ resource "aws_lambda_function" "post_lambda_function" {
   function_name    = "MyPostLambdaFunction"
   role             = aws_iam_role.lambda_execution.arn
   handler          = "post_index.handler"
-  runtime          = "nodejs20.x"
+  runtime          = "python3.9"
   source_code_hash = filebase64sha256("post_lambda_function_payload.zip")
 }
 
@@ -52,7 +52,7 @@ resource "aws_api_gateway_resource" "api_gateway_resource" {
   path_part   = "myresource"
 }
 
-resource "aws_api_gateway_method" "api_gateway_get_method" {
+resource "aws_api_gateway_method" "api_gateway_method" {
   rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
   resource_id   = aws_api_gateway_resource.api_gateway_resource.id
   http_method   = "GET"
@@ -88,9 +88,9 @@ resource "aws_lambda_permission" "post_api_gateway_lambda_permission" {
 resource "aws_api_gateway_integration" "api_gateway_get_integration" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
   resource_id = aws_api_gateway_resource.api_gateway_resource.id
-  http_method = aws_api_gateway_method.api_gateway_get_method.http_method
+  http_method = aws_api_gateway_method.api_gateway_method.http_method
   type        = "AWS_PROXY"
-  integration_http_method = "POST"
+  integration_http_method = "GET"
   uri         = aws_lambda_function.lambda_function.invoke_arn
 }
 
